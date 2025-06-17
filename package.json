@@ -1,0 +1,21 @@
+{
+  "name": "transfomation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/helloWorld.js",
+    "test": "vitest"
+  },
+  "keywords": [],
+  "author": "Natalia Novikova <novikovanatalie@protonmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^9.29.0",
+    "eslint": "^9.29.0",
+    "globals": "^16.2.0",
+    "nodemon": "^3.1.10",
+    "vitest": "^3.2.3"
+  }
+}
