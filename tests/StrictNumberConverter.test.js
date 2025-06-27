@@ -22,16 +22,36 @@ describe('StrictNumberConverter - convertToNumber', () => {
   it('throws error for unsupported types', () => {
     const converter = new StrictNumberConverter(true);
     expect(() => converter.convertToNumber()).toThrow();
+  });
 
-    // it('converts object with toString() to number', () => {
-    //   const obj = {
-    //     toString() {
-    //       return '100+23';
-    //     },
-    //   };
-    //   const converter = new StrictNumberConverter(obj);
-    //   expect(converter.convertToNumber()).toBe(123);
-    // });
+  it('converts object to number', () => {
+    const nestedObj = {
+      a: 10,
+      b: '20+5',
+      c: {
+        d: 'abc', // invalid string
+        e: 3,
+        f: {
+          g: '7.5+2.5',
+          h: {
+            i: 100,
+            j: 'xyz', // invalid string
+            k: {
+              l: '1+2+3',
+              m: 4,
+              n: {
+                o: '5.5',
+                p: 'not a number', // invalid string
+                q: 6,
+              },
+            },
+          },
+        },
+      },
+      r: '8',
+    };
+    const converter = new StrictNumberConverter(nestedObj);
+    expect(converter.convertToNumber()).toBe(1025310100645.568);
   });
 });
 

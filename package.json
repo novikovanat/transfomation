@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/StrictNumberConverter.js",
+    "dev": "nodemon src/classes/StrictNumberConverter.js",
     "test": "vitest"
   },
   "keywords": [],

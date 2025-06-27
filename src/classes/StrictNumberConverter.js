@@ -8,7 +8,6 @@ export class StrictNumberConverter {
 
   #parseAndSum(stringValue) {
     let isValidString = stringValue.replaceAll(DIGITS_AND_DOT, '');
-
     if (!isValidString) {
       return;
     }
@@ -31,19 +30,18 @@ export class StrictNumberConverter {
     return stringSum;
   }
 
-  #convertObjectToSum() {
-    let sum = 0;
+  #convertToFlatObject() {
+    let sumArray = [];
     const flattingObj = (object) => {
       for (let element in object) {
         const value = object[element];
         switch (typeof value) {
           case 'number':
-            sum += value;
+            sumArray.push(value);
             break;
           case 'string':
             if (this.#parseAndSum(value)) {
-              const i = this.#parseAndSum(value);
-              sum += i;
+              sumArray.push(this.#parseAndSum(value));
               break;
             } else {
               break;
@@ -52,9 +50,20 @@ export class StrictNumberConverter {
             flattingObj(value);
         }
       }
-      return sum;
+      return sumArray;
     };
     return flattingObj(this.value);
+  }
+
+  #convertObjectToSum() {
+    const flatArray = this.#convertToFlatObject();
+    return flatArray.reduce((acc, val) => acc + val, 0);
+  }
+
+  #convertObjectToNumber() {
+    const flatArray = this.#convertToFlatObject();
+    const concatenated = flatArray.join('');
+    return Number(concatenated);
   }
 
   convertToNumber() {
@@ -65,7 +74,10 @@ export class StrictNumberConverter {
         }
         return this.#parseAndSum(this.value);
       case 'object':
-        return this.#parseAndSum(this.value.toString());
+        if (!this.value) {
+          throw Error('Empty object or array');
+        }
+        return this.#convertObjectToNumber();
       case 'number':
         return this.value;
       default:
@@ -98,7 +110,7 @@ export class StrictNumberConverter {
   }
 }
 
-let foo = '+';
+let foo = null;
 const convertedValue = new StrictNumberConverter(foo);
 
 try {
