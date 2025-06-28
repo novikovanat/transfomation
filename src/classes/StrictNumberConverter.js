@@ -52,16 +52,18 @@ export class StrictNumberConverter {
     const flattingObj = (object) => {
       for (let element in object) {
         const value = object[element];
+
         switch (typeof value) {
           case 'number':
             sumArray.push(value);
             break;
-          case 'string':
-            if (this.#parseAndSum(value)) {
-              sumArray.push(this.#parseAndSum(value));
-              break;
+          case 'string': {
+            const parsedValue = this.#parseAndSum(value);
+            if (parsedValue) {
+              sumArray.push(parsedValue);
             }
             break;
+          }
           case 'object':
             if (!value) {
               break;
@@ -94,11 +96,13 @@ export class StrictNumberConverter {
 
   convertToNumber() {
     switch (this.type) {
-      case 'string':
-        if (!this.#parseAndSum(this.value)) {
+      case 'string': {
+        const parsedValue = this.#parseAndSum(this.value);
+        if (!parsedValue) {
           throw Error('There is no digits in your string');
         }
-        return this.#parseAndSum(this.value);
+        return parsedValue;
+      }
       case 'object':
         if (!this.value) {
           throw Error('Empty object or array');
@@ -122,12 +126,13 @@ export class StrictNumberConverter {
         return this.#convertObjectToSum();
       case 'number':
         return this.value;
-      case 'string':
-        if (!this.#parseAndSum(this.value)) {
+      case 'string': {
+        const parsedValue = this.#parseAndSum(this.value);
+        if (!parsedValue) {
           throw Error('There is no digits in your string');
-        } else {
-          return this.#parseAndSum(this.value);
         }
+        return parsedValue;
+      }
       default:
         throw new Error(
           `${this.type} can't be converted by StrictNuberConvector `,
