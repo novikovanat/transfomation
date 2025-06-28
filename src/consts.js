@@ -1,1 +1,2 @@
-export const DIGITS_AND_DOT = /[^0-9.+]/g;
+export const DIGITS_DOT_PLUS = /[^0-9.+]/g;
+export const DOT = /\./g;

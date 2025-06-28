@@ -1,4 +1,4 @@
-import { DIGITS_AND_DOT } from '../consts.js';
+import { DIGITS_DOT_PLUS, DOT } from '../consts.js';
 
 export class StrictNumberConverter {
   constructor(value) {
@@ -7,24 +7,41 @@ export class StrictNumberConverter {
   }
 
   #parseAndSum(stringValue) {
-    let isValidString = stringValue.replaceAll(DIGITS_AND_DOT, '');
-    if (!isValidString) {
+    let cleand = stringValue.replaceAll(DIGITS_DOT_PLUS, '');
+    if (!cleand) {
       return;
     }
-    const index = isValidString.indexOf('+');
-    if (index === -1) {
-      return parseFloat(isValidString);
+    const dotIndex = cleand.indexOf('.');
+
+    const plusIndex = cleand.indexOf('+');
+    if (plusIndex === -1) {
+      if (dotIndex > -1) {
+        cleand =
+          cleand.substr(0, dotIndex + 1) +
+          cleand.slice(dotIndex).replace(DOT, '');
+      }
+      return parseFloat(cleand);
     }
-    if (index === 0) {
-      if (isValidString.length < 2) {
+    if (plusIndex === 0) {
+      if (cleand.length < 2) {
         return;
       } else {
-        isValidString = isValidString.slice(1);
+        cleand = cleand.slice(1);
       }
     }
-    const addends = isValidString.split('+');
+    if (plusIndex === cleand.length - 1) {
+      cleand = cleand.slice(0, -1);
+    }
+    const addends = cleand.split('+');
     let stringSum = 0;
     for (let i = 0; i < addends.length; i++) {
+      const dotIndexAddend = addends[i].indexOf('.');
+      if (dotIndexAddend > -1) {
+        addends[i] =
+          addends[i].substr(0, dotIndexAddend + 1) +
+          addends[i].slice(dotIndexAddend).replace(DOT, '');
+      }
+
       stringSum += parseFloat(addends[i]);
     }
     return stringSum;
@@ -43,11 +60,14 @@ export class StrictNumberConverter {
             if (this.#parseAndSum(value)) {
               sumArray.push(this.#parseAndSum(value));
               break;
-            } else {
+            }
+            break;
+          case 'object':
+            if (!value) {
               break;
             }
-          case 'object':
             flattingObj(value);
+            break;
         }
       }
       return sumArray;
@@ -62,7 +82,13 @@ export class StrictNumberConverter {
 
   #convertObjectToNumber() {
     const flatArray = this.#convertToFlatObject();
-    const concatenated = flatArray.join('');
+    let concatenated = flatArray.join('');
+    const dotIndex = concatenated.indexOf('.');
+    if (dotIndex > -1) {
+      concatenated =
+        concatenated.substring(0, dotIndex + 1) +
+        concatenated.slice(dotIndex).replace(DOT, '');
+    }
     return Number(concatenated);
   }
 
@@ -110,8 +136,15 @@ export class StrictNumberConverter {
   }
 }
 
-let foo = null;
-const convertedValue = new StrictNumberConverter(foo);
+const mixedObj = {
+  a: '10.5.25',
+  b: '5.2.1+3.1.4',
+  c: {
+    d: '7.8.9',
+    e: '2.0.0+1.5.5',
+  },
+};
+const convertedValue = new StrictNumberConverter(mixedObj);
 
 try {
   console.log(convertedValue.convertToSum());
@@ -119,3 +152,5 @@ try {
 } catch (error) {
   console.log(error);
 }
+
+console.log(parseFloat('10.5.25'));
