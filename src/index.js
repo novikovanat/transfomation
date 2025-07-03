@@ -6,18 +6,3 @@ export const invertBoolean = (value) => {
   }
   return !value;
 };
-
-// console.log(parseFloat('L'));
-
-// export const strictConvertToNumber = (value) => {
-//   const dataType = typeof value;
-
-//   if (dataType === 'string') {
-//     const isValidString = value.replaceAll(DIGITS_AND_DOT, '');
-//     if (isValidString) {
-//       return;
-//     } else {
-//       v;
-//     }
-//   }
-// };

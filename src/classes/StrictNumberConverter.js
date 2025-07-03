@@ -140,22 +140,3 @@ export class StrictNumberConverter {
     }
   }
 }
-
-const mixedObj = {
-  a: '10.5.25',
-  b: '5.2.1+3.1.4',
-  c: {
-    d: '7.8.9',
-    e: '2.0.0+1.5.5',
-  },
-};
-const convertedValue = new StrictNumberConverter(mixedObj);
-
-try {
-  console.log(convertedValue.convertToSum());
-  console.log(convertedValue.convertToNumber());
-} catch (error) {
-  console.log(error);
-}
-
-console.log(parseFloat('10.5.25'));
