@@ -1,9 +1,11 @@
 import { DIGITS_DOT_PLUS, DOT } from '../consts.js';
 
 export class StrictNumberConverter {
+  #value;
+  #type;
   constructor(value) {
-    this.value = value;
-    this.type = typeof this.value;
+    this.#value = value;
+    this.#type = typeof this.#value;
   }
 
   #parseAndSum(stringValue) {
@@ -74,7 +76,7 @@ export class StrictNumberConverter {
       }
       return sumArray;
     };
-    return flattingObj(this.value);
+    return flattingObj(this.#value);
   }
 
   #convertObjectToSum() {
@@ -95,39 +97,39 @@ export class StrictNumberConverter {
   }
 
   convertToNumber() {
-    switch (this.type) {
+    switch (this.#type) {
       case 'string': {
-        const parsedValue = this.#parseAndSum(this.value);
+        const parsedValue = this.#parseAndSum(this.#value);
         if (!parsedValue) {
           throw Error('There is no digits in your string');
         }
         return parsedValue;
       }
       case 'object':
-        if (!this.value) {
+        if (!this.#value) {
           throw Error('Empty object or array');
         }
         return this.#convertObjectToNumber();
       case 'number':
-        return this.value;
+        return this.#value;
       default:
         throw new Error(
-          `${this.type} can't be converted by StrictNuberConvector `,
+          `${this.#type} can't be converted by StrictNuberConvector `,
         );
     }
   }
 
   convertToSum() {
-    switch (this.type) {
+    switch (this.#type) {
       case 'object':
-        if (!this.value) {
+        if (!this.#value) {
           throw Error('Empty object or array');
         }
         return this.#convertObjectToSum();
       case 'number':
-        return this.value;
+        return this.#value;
       case 'string': {
-        const parsedValue = this.#parseAndSum(this.value);
+        const parsedValue = this.#parseAndSum(this.#value);
         if (!parsedValue) {
           throw Error('There is no digits in your string');
         }
@@ -135,7 +137,7 @@ export class StrictNumberConverter {
       }
       default:
         throw new Error(
-          `${this.type} can't be converted by StrictNuberConvector `,
+          `${this.#type} can't be converted by StrictNuberConvector `,
         );
     }
   }

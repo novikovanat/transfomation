@@ -1,7 +1,10 @@
 export class StringifyValue {
+  #value;
+  #type;
+
   constructor(value) {
-    this.value = value;
-    this.type = typeof this.value;
+    this.#value = value;
+    this.#type = typeof value;
   }
 
   #getCircularReplacer() {
@@ -18,28 +21,32 @@ export class StringifyValue {
   }
 
   toString() {
-    switch (this.type) {
+    return this.#toString(this.#type, this.#value);
+  }
+
+  #toString(type, value) {
+    switch (type) {
       case 'string':
-        return this.value;
+        return value;
 
       case 'undefined':
         return 'undefined';
 
       case 'object': {
-        if (this.value === null) {
+        if (value === null) {
           return 'null';
         }
         try {
-          return JSON.stringify(this.value);
+          return JSON.stringify(value);
         } catch (error) {
           if (error.message.includes('circular')) {
-            return JSON.stringify(this.value, this.#getCircularReplacer());
+            return JSON.stringify(value, this.#getCircularReplacer());
           }
           throw error;
         }
       }
       default:
-        return this.value.toString();
+        return value.toString();
     }
   }
 }
