@@ -23,7 +23,7 @@ export class CoerceToType {
     if (typeof targetType === 'string') {
       return targetType.toLowerCase();
     }
-    error('Name of target type must be a string');
+    error('Name of a target type must be a string');
   }
 
   #coerce() {
@@ -31,7 +31,7 @@ export class CoerceToType {
       case 'string':
         return new StringifyValue(this.#value).toString();
       case 'number':
-        return new StrictNumberConverter(this.#value).toNumber();
+        return new StrictNumberConverter(this.#value).convertToNumber();
       case 'boolean':
         if (this.#valueType === 'boolean') return this.#value;
         else if (this.#valueType === 'string') {
@@ -49,24 +49,39 @@ export class CoerceToType {
         break;
 
       case 'bigint':
-        if (this.#valueType === 'bigint') return this.#value;
-        if (this.#valueType === 'number') {
-          if (!Number.isInteger(this.#value)) {
-            error('Value must be an integer');
+        switch (this.#valueType) {
+          case 'bigint':
+            return this.#value;
+          case 'number':
+            if (!Number.isInteger(this.#value)) {
+              error('Value must be an integer');
+            }
+            return BigInt(this.#value);
+          case 'string': {
+            const v = Number.parseFloat(this.#value);
+            if (isNaN(v)) {
+              error('String must start with a digits');
+            } else if (!Number.isInteger(v)) {
+              error('Value must be an integer');
+            } else {
+              return BigInt(v);
+            }
+            break;
           }
-          return BigInt(this.#value);
-        }
-        if (this.#valueType === 'string') {
-          const v = Number.parseFloat(this.#value);
-          if (isNaN(v)) {
-            error('String must start with a digits');
-          } else if (!Number.isInteger(v)) {
-            error('Value must be an integer');
-          } else {
-            return BigInt(v);
+          case 'object': {
+            const number = new StrictNumberConverter(
+              this.#value,
+            ).convertToNumber();
+
+            if (!Number.isInteger(number)) {
+              error(`This object cannot be converted to a bigint`);
+            }
+            return BigInt(number);
           }
-        } else {
-          error(`Cannot coerce type ${this.#valueType} to ${this.#targetType}`);
+          default:
+            error(
+              `Cannot coerce type ${this.#valueType} to ${this.#targetType}`,
+            );
         }
         break;
 
@@ -90,21 +105,25 @@ export class CoerceToType {
         )
           return [this.#value];
         return error(
-          `Cannot coerce type ${this.#valueType} to ${this.#targetType}`,
+          `Cannot coerce type ${
+            this.#value === null ? 'null' : this.#valueType
+          } to ${this.#targetType}`,
         );
 
       case 'object':
         if (this.#value === null || this.#value === undefined) {
-          error(`Cannot  coerce null or undefined to ${this.#targetType}`);
+          error(`Cannot coerce null or undefined to ${this.#targetType}`);
         }
         if (this.#valueType === 'object') return this.#value;
         if (this.#valueType === 'string') {
-          return console.log('Object to string');
+          return console.log('String to object');
         }
     }
   }
 }
 
 // Test the functionality
-const obj = 1;
-console.log('Converting ', new CoerceToType('string', 'object').coerce());
+console.log('Starting debug test...');
+debugger; // This will force the debugger to stop here
+console.log('Converting ', new CoerceToType({ a: 'lol' }, 'bigint').coerce());
+console.log('Debug test completed');
