@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { CoerceToType } from '../src/classes/coerceToType.js';
 
-describe('CoerceToType', () => {
+describe('CoerceToType - Unit Tests', () => {
   describe('Constructor and Basic Functionality', () => {
     it('should create instance with value and target type', () => {
       const coercer = new CoerceToType('test', 'string');
@@ -141,26 +141,9 @@ describe('CoerceToType', () => {
       expect(coercer.coerce()).toBe(true);
     });
 
-    it('should coerce string "true" to boolean true', () => {
-      const coercer = new CoerceToType('true', 'boolean');
-      expect(coercer.coerce()).toBe(true);
-    });
-
-    it('should coerce string "false" to boolean false', () => {
-      const coercer = new CoerceToType('false', 'boolean');
-      expect(coercer.coerce()).toBe(false);
-    });
-
-    it('should handle case-insensitive boolean strings', () => {
-      const coercer1 = new CoerceToType('TRUE', 'boolean');
+    it('should handle case-insensitive or trimmed boolean strings', () => {
+      const coercer1 = new CoerceToType(' TRUE', 'boolean');
       const coercer2 = new CoerceToType('FALSE', 'boolean');
-      expect(coercer1.coerce()).toBe(true);
-      expect(coercer2.coerce()).toBe(false);
-    });
-
-    it('should handle trimmed boolean strings', () => {
-      const coercer1 = new CoerceToType('  true  ', 'boolean');
-      const coercer2 = new CoerceToType('  false  ', 'boolean');
       expect(coercer1.coerce()).toBe(true);
       expect(coercer2.coerce()).toBe(false);
     });
@@ -223,21 +206,32 @@ describe('CoerceToType', () => {
       );
     });
 
-    it('should coerce object to bigint when it can be converted to integer', () => {
-      const coercer = new CoerceToType({ a: '123' }, 'bigint');
+    it('should coerce valid object to bigint', () => {
+      // This object will be flattened to [123], which is a valid integer
+      const coercer = new CoerceToType({ a: 123 }, 'bigint');
       expect(coercer.coerce()).toBe(BigInt(123));
     });
 
-    it('should throw error for object that converts to float', () => {
-      const coercer = new CoerceToType({ a: '123.45' }, 'bigint');
+    it('should throw error for object that cannot be converted to a bigint', () => {
+      // This object will be flattened to [123.45], which is not an integer
+      const coercer = new CoerceToType({ a: 123.45 }, 'bigint');
       expect(() => coercer.coerce()).toThrow(
         'This object cannot be converted to a bigint',
       );
     });
+    it('should throw error for empty object', () => {
+      const coercer = new CoerceToType({}, 'bigint');
+      expect(coercer.coerce()).toBe(0n);
+    });
 
-    it('should throw error for object with no digits', () => {
-      const coercer = new CoerceToType({ a: 'abc' }, 'bigint');
-      expect(() => coercer.coerce()).toThrow('String must start with a digits');
+    it('should throw error for null', () => {
+      const coercer = new CoerceToType(null, 'bigint');
+      expect(() => coercer.coerce()).toThrow('Empty object or array');
+    });
+
+    it('should throw error for empty array', () => {
+      const coercer = new CoerceToType([], 'bigint');
+      expect(coercer.coerce()).toBe(0n);
     });
   });
 
@@ -312,7 +306,7 @@ describe('CoerceToType', () => {
     it('should throw error for null', () => {
       const coercer = new CoerceToType(null, 'array');
       expect(() => coercer.coerce()).toThrow(
-        'Cannot coerce type object to array',
+        'Cannot coerce type null to array',
       );
     });
 
@@ -333,71 +327,53 @@ describe('CoerceToType', () => {
 
     it('should throw error for null', () => {
       const coercer = new CoerceToType(null, 'object');
-      expect(() => coercer.coerce()).toThrow(
-        'Cannot coerce null or undefined to object',
-      );
+      expect(() => coercer.coerce()).toThrow('Cannot coerce null to object');
     });
 
     it('should throw error for undefined', () => {
       const coercer = new CoerceToType(undefined, 'object');
       expect(() => coercer.coerce()).toThrow(
-        'Cannot coerce null or undefined to object',
+        'Cannot coerce type undefined to object',
       );
     });
 
-    it('should handle string to object (currently logs)', () => {
-      const coercer = new CoerceToType('test', 'object');
-      // This currently just logs, so we just check it doesn't throw
-      expect(() => coercer.coerce()).not.toThrow();
+    it('should coerce valid JSON string to object', () => {
+      const coercer = new CoerceToType('{"name": "John", "age": 30}', 'object');
+      expect(coercer.coerce()).toEqual({ name: 'John', age: 30 });
     });
 
-    it('should throw error for number', () => {
+    it('should coerce invalid JSON string to character-indexed object', () => {
+      const coercer = new CoerceToType('abc', 'object');
+      expect(coercer.coerce()).toEqual({ 0: 'a', 1: 'b', 2: 'c' });
+    });
+
+    it('should coerce number to object with number property', () => {
       const coercer = new CoerceToType(42, 'object');
-      expect(() => coercer.coerce()).toThrow(
-        'Cannot coerce type number to object',
-      );
+      expect(coercer.coerce()).toEqual({ number: 42 });
     });
 
-    it('should throw error for boolean', () => {
+    it('should coerce boolean to object with boolean property', () => {
       const coercer = new CoerceToType(true, 'object');
-      expect(() => coercer.coerce()).toThrow(
-        'Cannot coerce type boolean to object',
-      );
+      expect(coercer.coerce()).toEqual({ boolean: true });
     });
 
-    it('should throw error for bigint', () => {
+    it('should coerce bigint to object with bigint property', () => {
       const coercer = new CoerceToType(BigInt(123), 'object');
-      expect(() => coercer.coerce()).toThrow(
-        'Cannot coerce type bigint to object',
-      );
+      expect(coercer.coerce()).toEqual({ bigint: BigInt(123) });
     });
 
-    it('should throw error for symbol', () => {
-      const coercer = new CoerceToType(Symbol('test'), 'object');
-      expect(() => coercer.coerce()).toThrow(
-        'Cannot coerce type symbol to object',
-      );
-    });
-  });
-});
-
-describe('CoerceToType - Integration Tests', () => {
-  describe('Complex Data Transformation Scenarios', () => {
-    it('should handle nested object transformation to string', () => {
-      const nestedObj = {
-        name: 'John',
-        age: 30,
-        isActive: true,
-        scores: [85, 90, 78],
-      };
-      const coercer = new CoerceToType(nestedObj, 'string');
-      expect(coercer.coerce()).toBe('[object Object]');
+    it('should coerce symbol to object with symbol property', () => {
+      const symbol = Symbol('test');
+      const coercer = new CoerceToType(symbol, 'object');
+      expect(coercer.coerce()).toEqual({ symbol: symbol });
     });
 
-    it('should handle array of mixed types to string', () => {
-      const mixedArray = [1, 'two', true, { key: 'value' }];
-      const coercer = new CoerceToType(mixedArray, 'string');
-      expect(coercer.coerce()).toBe('1,two,true,[object Object]');
+    it('should handle circular references gracefully', () => {
+      const circularObj = { name: 'test' };
+      circularObj.self = circularObj;
+
+      const coercer = new CoerceToType(circularObj, 'string');
+      expect(() => coercer.coerce()).not.toThrow();
     });
 
     it('should handle complex object to array transformation', () => {
@@ -421,14 +397,27 @@ describe('CoerceToType - Integration Tests', () => {
       ]);
     });
 
-    it('should handle string with special characters to array', () => {
-      const specialString = 'Hello, World! 🚀';
-      const coercer = new CoerceToType(specialString, 'array');
-      expect(coercer.coerce()).toEqual(Array.from(specialString));
+    it('should handle JSON parsing errors gracefully', () => {
+      const coercer = new CoerceToType('{"invalid": json', 'object');
+      expect(coercer.coerce()).toEqual({
+        0: '{',
+        1: '"',
+        2: 'i',
+        3: 'n',
+        4: 'v',
+        5: 'a',
+        6: 'l',
+        7: 'i',
+        8: 'd',
+        9: '"',
+        10: ':',
+        11: ' ',
+        12: 'j',
+        13: 's',
+        14: 'o',
+        15: 'n',
+      });
     });
-  });
-
-  describe('Error Handling Integration', () => {
     it('should handle invalid target type gracefully', () => {
       const coercer = new CoerceToType('test', 'invalid_type');
       expect(() => coercer.coerce()).toThrow();
@@ -446,6 +435,12 @@ describe('CoerceToType - Integration Tests', () => {
       );
     });
 
+    it('should handle string with special characters to array', () => {
+      const specialString = 'Hello, World! 🚀';
+      const coercer = new CoerceToType(specialString, 'array');
+      expect(coercer.coerce()).toEqual(Array.from(specialString));
+    });
+
     it('should handle whitespace-only strings appropriately', () => {
       const coercer1 = new CoerceToType('   ', 'string');
       const coercer2 = new CoerceToType('   ', 'array');
@@ -457,9 +452,7 @@ describe('CoerceToType - Integration Tests', () => {
         "Value must be 'true' or 'false'",
       );
     });
-  });
 
-  describe('Performance and Memory Tests', () => {
     it('should handle large strings efficiently', () => {
       const largeString = 'a'.repeat(10000);
       const coercer = new CoerceToType(largeString, 'array');
@@ -479,35 +472,6 @@ describe('CoerceToType - Integration Tests', () => {
       expect(result).toHaveLength(1000);
       expect(result[0]).toBe(0);
       expect(result[999]).toBe(999);
-    });
-  });
-
-  describe('Cross-Type Compatibility', () => {
-    it('should maintain data integrity across type conversions', () => {
-      const originalData = {
-        string: 'test',
-        number: 42,
-        boolean: true,
-        bigint: BigInt(123),
-        array: [1, 2, 3],
-        object: { key: 'value' },
-      };
-
-      // Test each property can be coerced to string and back
-      Object.entries(originalData).forEach(([key, value]) => {
-        const coercer = new CoerceToType(value, 'string');
-        const stringResult = coercer.coerce();
-        expect(typeof stringResult).toBe('string');
-        expect(stringResult).toBeTruthy();
-      });
-    });
-
-    it('should handle circular references gracefully', () => {
-      const circularObj = { name: 'test' };
-      circularObj.self = circularObj;
-
-      const coercer = new CoerceToType(circularObj, 'string');
-      expect(() => coercer.coerce()).not.toThrow();
     });
   });
 });

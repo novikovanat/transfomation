@@ -1,2 +1,6 @@
 export const DIGITS_DOT_PLUS = /[^0-9.+]/g;
 export const DOT = /\./g;
+export const EXPONENTIAL_NUMBER = /^[+-]?\d+(\.\d+)?[eE][+-]?\d+$/;
+export const BINARY_NUMBER = /^0[bB][01]+$/;
+export const OCTAL_NUMBER = /^0[oO][0-7]+$/;
+export const HEXADECIMAL_NUMBER = /^0[xX][0-9a-fA-F]+$/;

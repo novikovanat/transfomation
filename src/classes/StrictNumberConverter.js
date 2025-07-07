@@ -1,4 +1,11 @@
-import { DIGITS_DOT_PLUS, DOT } from '../consts.js';
+import {
+  BINARY_NUMBER,
+  DIGITS_DOT_PLUS,
+  DOT,
+  EXPONENTIAL_NUMBER,
+  HEXADECIMAL_NUMBER,
+  OCTAL_NUMBER,
+} from '../consts.js';
 
 export class StrictNumberConverter {
   #value;
@@ -9,6 +16,14 @@ export class StrictNumberConverter {
   }
 
   #parseAndSum(stringValue) {
+    if (
+      EXPONENTIAL_NUMBER.test(stringValue) ||
+      BINARY_NUMBER.test(stringValue) ||
+      OCTAL_NUMBER.test(stringValue) ||
+      HEXADECIMAL_NUMBER.test(stringValue)
+    ) {
+      return Number(stringValue);
+    }
     let cleand = stringValue.replaceAll(DIGITS_DOT_PLUS, '');
     if (!cleand) {
       return;

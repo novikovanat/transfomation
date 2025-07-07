@@ -111,19 +111,47 @@ export class CoerceToType {
         );
 
       case 'object':
-        if (this.#value === null || this.#value === undefined) {
-          error(`Cannot coerce null or undefined to ${this.#targetType}`);
+        switch (this.#valueType) {
+          case 'object':
+            if (this.#value === null) {
+              error('Cannot coerce null to object');
+            }
+            return this.#value;
+          case 'string': {
+            try {
+              return JSON.parse(this.#value);
+            } catch (error) {
+              if (error instanceof SyntaxError) {
+                const result = {};
+                for (let i = 0; i < this.#value.length; i++) {
+                  result[i] = this.#value[i];
+                }
+                return result;
+              }
+
+              error(error.message);
+            }
+            break;
+          }
+          case 'number':
+            return { number: this.#value };
+          case 'boolean':
+            return { boolean: this.#value };
+          case 'bigint':
+            return { bigint: this.#value };
+          case 'symbol':
+            return { symbol: this.#value };
+          default:
+            error(
+              `Cannot coerce type ${this.#valueType} to ${this.#targetType}`,
+            );
         }
-        if (this.#valueType === 'object') return this.#value;
-        if (this.#valueType === 'string') {
-          return console.log('String to object');
-        }
+        break;
+      default:
+        error(`Invalid target type: ${this.#targetType}`);
     }
   }
 }
 
-// Test the functionality
-console.log('Starting debug test...');
-debugger; // This will force the debugger to stop here
-console.log('Converting ', new CoerceToType({ a: 'lol' }, 'bigint').coerce());
-console.log('Debug test completed');
+console.log(new CoerceToType('175e-2', 'number').coerce());
+console.log(Number(175e-2));
