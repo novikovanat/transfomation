@@ -7,7 +7,6 @@
   "exports": {
     ".": "./index.js",
     "./addValues": "./src/classes/addValues.js",
-    "./addValues2": "./src/classes/addValues2.js",
     "./strictNumberConverter": "./src/classes/StrictNumberConverter.js",
     "./coerceToType": "./src/classes/coerceToType.js",
     "./stringifyValue": "./src/classes/stringifyValue.js"
@@ -24,7 +23,7 @@
     "coerce": "nodemon src/classes/coerceToType.js",
     "test": "vitest",
     "test:coverage": "vitest --coverage"
-    
+
   },
   "keywords": [
     "transformation",
