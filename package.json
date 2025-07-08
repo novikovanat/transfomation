@@ -1,24 +1,60 @@
 {
-  "name": "transfomation",
+  "name": "transformation-utils",
   "version": "1.0.0",
-  "description": "",
+  "description": "A utility library for data transformation, type coercion, and value manipulation",
   "main": "index.js",
   "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./addValues": "./src/classes/addValues.js",
+    "./addValues2": "./src/classes/addValues2.js",
+    "./strictNumberConverter": "./src/classes/StrictNumberConverter.js",
+    "./coerceToType": "./src/classes/coerceToType.js",
+    "./stringifyValue": "./src/classes/stringifyValue.js"
+  },
+  "files": [
+    "index.js",
+    "src/**/*.js",
+    "README.md"
+  ],
   "scripts": {
     "number": "nodemon src/classes/StrictNumberConverter.js",
     "stringify": "nodemon src/classes/StringifyValue.js",
     "add": "nodemon src/classes/addValues.js",
     "coerce": "nodemon src/classes/coerceToType.js",
-    "test": "vitest"
+    "test": "vitest",
+    "test:coverage": "vitest --coverage"
+    
   },
-  "keywords": [],
+  "keywords": [
+    "transformation",
+    "type-coercion",
+    "data-manipulation",
+    "string-conversion",
+    "number-conversion",
+    "value-utils",
+    "javascript",
+    "es6-modules"
+  ],
   "author": "Natalia Novikova <novikovanatalie@protonmail.com>",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/novikovanat/transformation-utils.git"
+  },
+  "bugs": {
+    "url": "https://github.com/novikovanat/transformation-utils/issues"
+  },
+  "homepage": "https://github.com/novikovanat/transformation-utils#readme",
   "devDependencies": {
     "@eslint/js": "^9.29.0",
+    "@vitest/coverage-v8": "^3.2.3",
     "eslint": "^9.29.0",
     "globals": "^16.2.0",
     "nodemon": "^3.1.10",
     "vitest": "^3.2.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
