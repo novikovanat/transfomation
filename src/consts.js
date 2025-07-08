@@ -4,3 +4,6 @@ export const EXPONENTIAL_NUMBER = /^[+-]?\d+(\.\d+)?[eE][+-]?\d+$/;
 export const BINARY_NUMBER = /^0[bB][01]+$/;
 export const OCTAL_NUMBER = /^0[oO][0-7]+$/;
 export const HEXADECIMAL_NUMBER = /^0[xX][0-9a-fA-F]+$/;
+export const DECIMAL_NUMBER = /^[+-]?\d+(\.\d+)?$/;
+export const INTEGER_NUMBER = /^[+-]?\d+$/;
+export const NO_DIGITS = /^[^\d]*$/;

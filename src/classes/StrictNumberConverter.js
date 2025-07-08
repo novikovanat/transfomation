@@ -5,6 +5,9 @@ import {
   EXPONENTIAL_NUMBER,
   HEXADECIMAL_NUMBER,
   OCTAL_NUMBER,
+  DECIMAL_NUMBER,
+  INTEGER_NUMBER,
+  NO_DIGITS,
 } from '../consts.js';
 
 export class StrictNumberConverter {
@@ -20,45 +23,43 @@ export class StrictNumberConverter {
       EXPONENTIAL_NUMBER.test(stringValue) ||
       BINARY_NUMBER.test(stringValue) ||
       OCTAL_NUMBER.test(stringValue) ||
-      HEXADECIMAL_NUMBER.test(stringValue)
+      HEXADECIMAL_NUMBER.test(stringValue) ||
+      DECIMAL_NUMBER.test(stringValue) ||
+      INTEGER_NUMBER.test(stringValue)
     ) {
       return Number(stringValue);
     }
-    let cleand = stringValue.replaceAll(DIGITS_DOT_PLUS, '');
-    if (!cleand) {
+    if (NO_DIGITS.test(stringValue)) {
       return;
     }
+    let cleand = stringValue.replaceAll(DIGITS_DOT_PLUS, '');
+    if (cleand.endsWith('+')) {
+      cleand = cleand.slice(0, -1);
+    }
+    if (cleand.startsWith('+')) {
+      cleand = cleand.slice(1);
+    }
+
     const dotIndex = cleand.indexOf('.');
 
-    const plusIndex = cleand.indexOf('+');
-    if (plusIndex === -1) {
-      if (dotIndex > -1) {
+    if (!cleand.includes('+')) {
+      if (cleand.includes('.', dotIndex + 1)) {
         cleand =
           cleand.substr(0, dotIndex + 1) +
           cleand.slice(dotIndex).replace(DOT, '');
       }
       return parseFloat(cleand);
     }
-    if (plusIndex === 0) {
-      if (cleand.length < 2) {
-        return;
-      } else {
-        cleand = cleand.slice(1);
-      }
-    }
-    if (plusIndex === cleand.length - 1) {
-      cleand = cleand.slice(0, -1);
-    }
+
     const addends = cleand.split('+');
     let stringSum = 0;
     for (let i = 0; i < addends.length; i++) {
       const dotIndexAddend = addends[i].indexOf('.');
-      if (dotIndexAddend > -1) {
+      if (dotIndexAddend > -1 && addends[i].includes('.', dotIndexAddend + 1)) {
         addends[i] =
           addends[i].substr(0, dotIndexAddend + 1) +
           addends[i].slice(dotIndexAddend).replace(DOT, '');
       }
-
       stringSum += parseFloat(addends[i]);
     }
     return stringSum;
@@ -115,7 +116,7 @@ export class StrictNumberConverter {
     switch (this.#type) {
       case 'string': {
         const parsedValue = this.#parseAndSum(this.#value);
-        if (!parsedValue) {
+        if (parsedValue === undefined) {
           throw Error('There is no digits in your string');
         }
         return parsedValue;

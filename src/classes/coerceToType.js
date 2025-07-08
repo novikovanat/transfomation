@@ -31,7 +31,13 @@ export class CoerceToType {
       case 'string':
         return new StringifyValue(this.#value).toString();
       case 'number':
-        return new StrictNumberConverter(this.#value).convertToNumber();
+        try {
+          return new StrictNumberConverter(this.#value).convertToNumber();
+        } catch (err) {
+          error(err.message);
+        }
+        break;
+
       case 'boolean':
         if (this.#valueType === 'boolean') return this.#value;
         else if (this.#valueType === 'string') {
@@ -152,6 +158,3 @@ export class CoerceToType {
     }
   }
 }
-
-console.log(new CoerceToType('175e-2', 'number').coerce());
-console.log(Number(175e-2));

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { StrictNumberConverter } from '../src/classes/StrictNumberConverter.js';
+import { StrictNumberConverter } from '../src/classes/strictNumberConverter.js';
 
 describe('StrictNumberConverter - convertToNumber method', () => {
   it('converts valid numeric string to number', () => {
