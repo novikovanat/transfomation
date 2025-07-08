@@ -114,17 +114,15 @@ import { StringifyValue } from 'transformation-utils';
 const stringifier = new StringifyValue();
 
 // Basic types
-console.log(stringifier.stringify(42)); // "42"
-console.log(stringifier.stringify(true)); // "true"
-console.log(stringifier.stringify(null)); // "null"
+console.log(new StringifyValue(42).toString()); // "42
+console.log(new StringifyValue(null)); // "null"
 
 // Objects and arrays
 
-console.log(stringifier.stringify({ a: 1, b: 2 })); // '{"a":1,"b":2}'
-console.log(stringifier.stringify([1, 2, 3])); // "[1,2,3]"
+console.log(new StringifyValue({ a: 1, b: 2 })).toString(); // '{"a":1,"b":2}'
 
 // Functions
-console.log(stringifier.stringify(() => {})); // "function"
+console.log(new StringifyValue(() => {})).toString; // "function"
 ```
 
 ## Error Handling
