@@ -147,12 +147,6 @@ Run the test suite:
 npm test
 ```
 
-Run tests in watch mode:
-
-```bash
-npm run test:watch
-```
-
 Run tests with coverage:
 
 ```bash
