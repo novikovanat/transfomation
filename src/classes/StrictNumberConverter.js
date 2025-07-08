@@ -127,6 +127,9 @@ export class StrictNumberConverter {
         }
         return this.#convertObjectToNumber();
       case 'number':
+        if (isNaN(this.#value)) {
+          throw Error("NaN can't be converted by StrictNuberConvector ");
+        }
         return this.#value;
       default:
         throw new Error(
@@ -143,6 +146,9 @@ export class StrictNumberConverter {
         }
         return this.#convertObjectToSum();
       case 'number':
+        if (isNaN(this.#value)) {
+          throw Error("NaN can't be converted by StrictNuberConvector");
+        }
         return this.#value;
       case 'string': {
         const parsedValue = this.#parseAndSum(this.#value);

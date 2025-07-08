@@ -37,6 +37,9 @@ export class AddValues {
           if (err.message.includes('There is no digits in your string')) {
             return String(this.#firstValue) + String(this.#secondValue);
           }
+          if (err.message.includes('NaN')) {
+            error('Addition not supported for NaN');
+          }
           error(err.message);
         }
         break;
