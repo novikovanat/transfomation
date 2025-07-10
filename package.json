@@ -23,7 +23,6 @@
     "coerce": "nodemon src/classes/coerceToType.js",
     "test": "vitest",
     "test:coverage": "vitest --coverage"
-
   },
   "keywords": [
     "transformation",
@@ -39,7 +38,7 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/novikovanat/transformation-utils.git"
+    "url": "git+https://github.com/novikovanat/transformation-utils.git"
   },
   "bugs": {
     "url": "https://github.com/novikovanat/transformation-utils/issues"
